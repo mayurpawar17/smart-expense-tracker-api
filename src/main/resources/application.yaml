@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: smart-expense-tacker-api
+
+  datasource:
+    url: jdbc:postgresql://ep-sparkling-lab-amc1xv05-pooler.c-5.us-east-1.aws.neon.tech/neondb?sslmode=require&channelBinding=require
+    username: neondb_owner
+    password: npg_1NWVOjvAkce6
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
