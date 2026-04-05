@@ -1,0 +1,65 @@
+package mayur.dev.smartexpensetackerapi.service;
+
+import lombok.RequiredArgsConstructor;
+import mayur.dev.smartexpensetackerapi.dto.ExpenseRequest;
+import mayur.dev.smartexpensetackerapi.dto.ExpenseResponse;
+import mayur.dev.smartexpensetackerapi.entity.Expense;
+import mayur.dev.smartexpensetackerapi.repository.ExpenseRepository;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class ExpenseService {
+    private final ExpenseRepository expenseRepository;
+
+
+    public ExpenseResponse createExpense(ExpenseRequest request) {
+
+        Expense expense = new Expense();
+        expense.setCategory(request.getCategory());
+        expense.setTitle(request.getTitle());
+        expense.setAmount(request.getAmount());
+        // Set this manually here so the database always has the correct time
+        expense.setCreatedAt(LocalDateTime.now());;
+
+        Expense saved = expenseRepository.save(expense);
+
+        return mapToResponse(saved);
+    }
+
+    public List<ExpenseResponse> getAllExpenses() {
+        return expenseRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+//    public ExpenseResponse updateExpense(Long id, ExpenseRequest request) {
+//        Expense expense = expenseRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("Expense not found"));
+//
+//        expense.setTitle(request.getTitle());
+//        expense.setAmount(request.getAmount());
+//        expense.setCreatedAt(request.getCreatedAt());
+//
+//        return mapToResponse(expenseRepository.save(expense));
+//    }
+//
+//    public void deleteExpense(Long id) {
+//        expenseRepository.deleteById(id);
+//    }
+
+    private ExpenseResponse mapToResponse(Expense e) {
+        ExpenseResponse res = new ExpenseResponse();
+        res.setId(e.getId());
+        res.setTitle(e.getTitle());
+        res.setAmount(e.getAmount());
+        res.setCategory(e.getCategory());
+        res.setCreatedAt(e.getCreatedAt());
+        return res;
+    }
+}
