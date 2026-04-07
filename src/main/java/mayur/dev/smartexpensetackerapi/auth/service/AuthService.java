@@ -7,7 +7,6 @@ import mayur.dev.smartexpensetackerapi.auth.dto.LoginRequest;
 import mayur.dev.smartexpensetackerapi.auth.dto.RegisterRequest;
 import mayur.dev.smartexpensetackerapi.auth.jwt.JwtUtil;
 import mayur.dev.smartexpensetackerapi.refreshToken.entity.RefreshToken;
-import mayur.dev.smartexpensetackerapi.refreshToken.repository.RefreshTokenRepository;
 import mayur.dev.smartexpensetackerapi.refreshToken.service.RefreshTokenService;
 import mayur.dev.smartexpensetackerapi.user.entity.User;
 import mayur.dev.smartexpensetackerapi.user.repository.UserRepository;
@@ -68,6 +67,10 @@ public class AuthService {
 
 //        return new AuthResponse(token, user.getEmail());
         return new AuthResponse(accessToken, refreshToken.getToken(), user.getEmail());
+    }
+
+    public void logout(User user) {
+        refreshTokenService.deleteByUser(user);
     }
 
 

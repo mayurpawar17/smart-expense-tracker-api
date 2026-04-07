@@ -6,10 +6,13 @@ import mayur.dev.smartexpensetackerapi.auth.dto.LoginRequest;
 import mayur.dev.smartexpensetackerapi.auth.dto.RegisterRequest;
 import mayur.dev.smartexpensetackerapi.auth.jwt.JwtUtil;
 import mayur.dev.smartexpensetackerapi.auth.service.AuthService;
+import mayur.dev.smartexpensetackerapi.core.utils.SecurityUtils;
 import mayur.dev.smartexpensetackerapi.core.utils.dto.ApiResponse;
 import mayur.dev.smartexpensetackerapi.refreshToken.dto.RefreshRequest;
 import mayur.dev.smartexpensetackerapi.refreshToken.entity.RefreshToken;
 import mayur.dev.smartexpensetackerapi.refreshToken.service.RefreshTokenService;
+import mayur.dev.smartexpensetackerapi.user.entity.User;
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,5 +51,14 @@ public class AuthController {
         AuthResponse response = new AuthResponse(newAccessToken, refreshToken.getToken(), refreshToken.getUser().getEmail());
 
         return ResponseEntity.ok(ApiResponse.success(response, "Token refreshed successfully"));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout() {
+        User user = SecurityUtils.getCurrentUser();
+
+        authService.logout(user);
+
+        return ResponseEntity.ok("Logged out successfully");
     }
 }

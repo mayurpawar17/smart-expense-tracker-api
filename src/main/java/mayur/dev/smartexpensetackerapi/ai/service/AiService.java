@@ -34,7 +34,7 @@ public class AiService {
 
         String prompt = """
                 Extract the following from the expense text:
-                - category (Food, Travel, Shopping, Bills, Entertainment, Other)
+                - category (Food, Travel, Shopping, Bills, Entertainment, Health, Groceries, Education, Transport, Housing, Insurance, Subscriptions, Personal Care, Gift, Savings, Debt, Other)
                 - amount (number only)
                 
                 STRICT RULES:
@@ -56,24 +56,19 @@ public class AiService {
         Map<String, Object> parts = Map.of("parts", List.of(textPart));
         Map<String, Object> body = Map.of("contents", List.of(parts));
 
-        HttpEntity<Map<String, Object>> request =
-                new HttpEntity<>(body, headers);
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
         String url = apiUrl + "?key=" + apiKey;
 
-        ResponseEntity<Map> response =
-                restTemplate.postForEntity(url, request, Map.class);
+        ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
 
         try {
             // Extract AI text
-            List<Map<String, Object>> candidates =
-                    (List<Map<String, Object>>) response.getBody().get("candidates");
+            List<Map<String, Object>> candidates = (List<Map<String, Object>>) response.getBody().get("candidates");
 
-            Map<String, Object> content =
-                    (Map<String, Object>) candidates.get(0).get("content");
+            Map<String, Object> content = (Map<String, Object>) candidates.get(0).get("content");
 
-            List<Map<String, Object>> partsList =
-                    (List<Map<String, Object>>) content.get("parts");
+            List<Map<String, Object>> partsList = (List<Map<String, Object>>) content.get("parts");
 
             String aiText = partsList.get(0).get("text").toString();
 
@@ -124,23 +119,18 @@ public class AiService {
         Map<String, Object> parts = Map.of("parts", List.of(textPart));
         Map<String, Object> body = Map.of("contents", List.of(parts));
 
-        HttpEntity<Map<String, Object>> request =
-                new HttpEntity<>(body, headers);
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
         String url = apiUrl + "?key=" + apiKey;
 
-        ResponseEntity<Map> response =
-                restTemplate.postForEntity(url, request, Map.class);
+        ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
 
         try {
-            List<Map<String, Object>> candidates =
-                    (List<Map<String, Object>>) response.getBody().get("candidates");
+            List<Map<String, Object>> candidates = (List<Map<String, Object>>) response.getBody().get("candidates");
 
-            Map<String, Object> content =
-                    (Map<String, Object>) candidates.get(0).get("content");
+            Map<String, Object> content = (Map<String, Object>) candidates.get(0).get("content");
 
-            List<Map<String, Object>> partsList =
-                    (List<Map<String, Object>>) content.get("parts");
+            List<Map<String, Object>> partsList = (List<Map<String, Object>>) content.get("parts");
 
             return partsList.get(0).get("text").toString();
 
@@ -152,37 +142,36 @@ public class AiService {
     private String buildPrompt(List<CategorySummary> summaryList) {
 
         return """
-    You are a financial assistant.
-
-    Analyze the expense summary and return JSON:
-
-    {
-      "summary": "short summary",
-      "topCategory": "category name",
-      "warning": "if overspending else null",
-      "suggestion": "money saving tip"
+                You are a financial assistant.
+                
+                Analyze the expense summary and return JSON:
+                
+                {
+                  "summary": "5-6 words",
+                  "topCategory": "category name",
+                  "warning": "if overspending else null",
+                  "suggestion": "money saving tip"
+                }
+                
+                Rules:
+                - Keep it short
+                - Only JSON
+                - No explanation
+                - No markdown
+                - Strictly 8-10 words for summary
+                - Strictly 8-10 words for warning
+                
+                Data:
+                %s
+                """.formatted(summaryList.toString());
     }
-
-    Rules:
-    - Keep it short
-    - Only JSON
-    - No explanation
-    - No markdown
-
-    Data:
-    %s
-    """.formatted(summaryList.toString());
-    }
-
 
 
     private InsightResponse fallbackInsights(List<CategorySummary> data) {
 
         InsightResponse res = new InsightResponse();
 
-        CategorySummary top = data.stream()
-                .max(Comparator.comparing(CategorySummary::getTotalAmount))
-                .orElse(null);
+        CategorySummary top = data.stream().max(Comparator.comparing(CategorySummary::getTotalAmount)).orElse(null);
 
         res.setSummary("Basic spending summary generated");
         res.setTopCategory(top != null ? top.getCategory() : "Unknown");
@@ -212,3 +201,10 @@ public class AiService {
         return 0.0;
     }
 }
+
+//    {
+//            "summary": "short summary",
+//            "topCategory": "category name",
+//            "warning": "if overspending else null",
+//            "suggestion": "money saving tip"
+//            }

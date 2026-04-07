@@ -2,7 +2,6 @@ package mayur.dev.smartexpensetackerapi.user.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import mayur.dev.smartexpensetackerapi.core.utils.enums.Role;
 
 
 @Entity
