@@ -17,9 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -111,20 +109,20 @@ public class ExpenseService {
         return aiService.generateInsights(summary);
     }
 
-//    public ExpenseResponse updateExpense(Long id, ExpenseRequest request) {
-//        Expense expense = expenseRepository.findById(id)
-//                .orElseThrow(() -> new RuntimeException("Expense not found"));
-//
-//        expense.setTitle(request.getTitle());
-//        expense.setAmount(request.getAmount());
-//        expense.setCreatedAt(request.getCreatedAt());
-//
-//        return mapToResponse(expenseRepository.save(expense));
-//    }
-//
-//    public void deleteExpense(Long id) {
-//        expenseRepository.deleteById(id);
-//    }
+   public ExpenseResponse updateExpense(Long id, ExpenseRequest request) {
+       Expense expense = expenseRepository.findById(id)
+               .orElseThrow(() -> new RuntimeException("Expense not found"));
+
+       expense.setTitle(request.getTitle());
+       expense.setAmount(request.getAmount());
+       //default current time
+       expense.setCreatedAt(LocalDateTime.now());
+       return mapToResponse(expenseRepository.save(expense));
+   }
+
+   public void deleteExpense(Long id) {
+       expenseRepository.deleteById(id);
+   }
 
     private ExpenseResponse mapToResponse(Expense e) {
         ExpenseResponse res = new ExpenseResponse();

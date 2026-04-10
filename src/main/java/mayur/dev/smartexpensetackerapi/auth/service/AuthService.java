@@ -25,7 +25,7 @@ public class AuthService {
 
     private  final RefreshTokenService refreshTokenService;
 
-
+    // Register
     public AuthResponse register(RegisterRequest request) {
 
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
@@ -69,6 +69,7 @@ public class AuthService {
         return new AuthResponse(accessToken, refreshToken.getToken(), user.getEmail());
     }
 
+    // Logout
     public void logout(User user) {
         refreshTokenService.deleteByUser(user);
     }

@@ -87,5 +87,18 @@ public class ExpenseController {
         return expenseService.getMonthlyInsights(user.getId(), month, year);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<ExpenseResponse>> updateExpense(@PathVariable Long id, @RequestBody @Valid ExpenseRequest expenseRequest) {
+        ExpenseResponse data = expenseService.updateExpense(id, expenseRequest);
+        return ResponseEntity.ok(ApiResponse.success(data, "Expense updated " + "successfully!"));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<String>> deleteExpense(@PathVariable Long id) {
+        expenseService.deleteExpense(id);
+        var data=" Id: " + id + " Expense deleted successfully!";
+        return ResponseEntity.ok(ApiResponse.success( data,"Expense deleted successfully!"));
+    }
+
 
 }
