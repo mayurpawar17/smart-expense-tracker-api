@@ -12,3 +12,20 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  
+ 
+  main:
+    # Turns off the Spring ASCII Art
+    banner-mode: "off"
+    # Optional: Silences startup info logs but keeps errors
+    log-startup-info: false
+
+logging:
+  level:
+    # Root level WARN silences the generic Spring/Hibernate/Tomcat logs
+    root: WARN
+    # Keep your specific package at INFO so you can see your own logs
+    mayur.dev.smartexpensetackerapi : INFO
+    # Silences the specific "Bean successfully defined" spam
+    org.springframework.web: WARN
+

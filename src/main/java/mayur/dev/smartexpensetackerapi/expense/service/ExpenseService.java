@@ -1,6 +1,7 @@
 package mayur.dev.smartexpensetackerapi.expense.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import mayur.dev.smartexpensetackerapi.ai.dto.ExpenseAiResponse;
 import mayur.dev.smartexpensetackerapi.ai.dto.InsightResponse;
 import mayur.dev.smartexpensetackerapi.ai.service.AiService;
@@ -12,6 +13,8 @@ import mayur.dev.smartexpensetackerapi.expense.entity.Expense;
 import mayur.dev.smartexpensetackerapi.expense.repository.ExpenseRepository;
 import mayur.dev.smartexpensetackerapi.user.entity.User;
 
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
