@@ -8,8 +8,11 @@ import mayur.dev.smartexpensetackerapi.core.utils.SecurityUtils;
 import mayur.dev.smartexpensetackerapi.core.utils.dto.ApiResponse;
 import mayur.dev.smartexpensetackerapi.expense.dto.ExpenseRequest;
 import mayur.dev.smartexpensetackerapi.expense.dto.ExpenseResponse;
+import mayur.dev.smartexpensetackerapi.expense.dto.PaginatedResponse;
 import mayur.dev.smartexpensetackerapi.expense.service.ExpenseService;
 import mayur.dev.smartexpensetackerapi.user.entity.User;
+
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,36 +39,62 @@ public class ExpenseController {
 
     }
 
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<ExpenseResponse>>> getAllExpenses(@RequestParam(required = false) String category) {
-        List<ExpenseResponse> data;
-        User user = SecurityUtils.getCurrentUser();
-        if (category != null && !category.isBlank()) {
-            String categoryInLowerCase = category.toLowerCase();
-            data = expenseService.getExpensesByCategory(user.getId(), categoryInLowerCase);
-        } else {
-            data = expenseService.getAllExpenses();
-        }
+    // @GetMapping
+    // public ResponseEntity<ApiResponse<List<ExpenseResponse>>> getAllExpenses(@RequestParam(required = false) String category) {
+    //     List<ExpenseResponse> data;
+    //     User user = SecurityUtils.getCurrentUser();
+    //     if (category != null && !category.isBlank()) {
+    //         String categoryInLowerCase = category.toLowerCase();
+    //         data = expenseService.getExpensesByCategory(user.getId(), categoryInLowerCase);
+    //     } else {
+    //         data = expenseService.getAllExpenses();
+    //     }
 
-        return ResponseEntity.ok(ApiResponse.success(data, "Expenses fetched successfully!"));
-    }
+    //     return ResponseEntity.ok(ApiResponse.success(data, "Expenses fetched successfully!"));
+    // }
+
+    @GetMapping
+public ResponseEntity<ApiResponse<PaginatedResponse<ExpenseResponse>>> getExpenses(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(required = false) String category
+) {
+    User user = SecurityUtils.getCurrentUser();
+
+    Page<ExpenseResponse> expensePage =
+            expenseService.getExpenses(user.getId(), category, page, size);
+
+    PaginatedResponse<ExpenseResponse> response = new PaginatedResponse<>();
+    response.setData(expensePage.getContent());
+    response.setPage(expensePage.getNumber());
+    response.setSize(expensePage.getSize());
+    response.setTotalElements(expensePage.getTotalElements());
+    response.setTotalPages(expensePage.getTotalPages());
+
+    return ResponseEntity.ok(
+            ApiResponse.success(response, "Expenses fetched successfully!")
+    );
+}
 
     @GetMapping("/total")
     public ResponseEntity<ApiResponse<Double>> getTotalExpense() {
-        var totalExpense = expenseService.getTotalExpense();
+         User user = SecurityUtils.getCurrentUser();
+        var totalExpense = expenseService.getTotalExpense(user.getId());
         return ResponseEntity.ok(ApiResponse.success(totalExpense, "Retrieved " + totalExpense + " total expense"));
     }
 
     @GetMapping("/analytics/category")
     public ResponseEntity<ApiResponse<List<CategoryData>>> categoryAnalytics() {
-        var categoryAnalytic = expenseService.getCategoryAnalytics();
+         User user = SecurityUtils.getCurrentUser();
+        var categoryAnalytic = expenseService.getCategoryAnalytics(user.getId());
         return ResponseEntity.ok(ApiResponse.success(categoryAnalytic, "Retrieved Category expense successfully"));
     }
 
     @GetMapping("/current-month-total")
     public ResponseEntity<ApiResponse<Map<String, BigDecimal>>> getCurrentMonthTotal() {
+             User user = SecurityUtils.getCurrentUser();
         // 1. Get the single value from the service
-        BigDecimal total = expenseService.getCurrentMonthTotal();
+        BigDecimal total = expenseService.getCurrentMonthTotal(user.getId());
 
         // 2. Create a Map and put the total inside it
         Map<String, BigDecimal> responseMap = new HashMap<>();

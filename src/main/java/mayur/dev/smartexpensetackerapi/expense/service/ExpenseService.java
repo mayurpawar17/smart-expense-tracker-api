@@ -6,12 +6,16 @@ import mayur.dev.smartexpensetackerapi.ai.dto.InsightResponse;
 import mayur.dev.smartexpensetackerapi.ai.service.AiService;
 import mayur.dev.smartexpensetackerapi.category.dto.CategorySummary;
 import mayur.dev.smartexpensetackerapi.category.entity.CategoryData;
-import mayur.dev.smartexpensetackerapi.core.utils.SecurityUtils;
 import mayur.dev.smartexpensetackerapi.expense.dto.ExpenseRequest;
 import mayur.dev.smartexpensetackerapi.expense.dto.ExpenseResponse;
 import mayur.dev.smartexpensetackerapi.expense.entity.Expense;
 import mayur.dev.smartexpensetackerapi.expense.repository.ExpenseRepository;
 import mayur.dev.smartexpensetackerapi.user.entity.User;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +25,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -70,19 +73,42 @@ public class ExpenseService {
         return mapToResponse(saved);
     }
 
-    public List<ExpenseResponse> getAllExpenses() {
-        User user = SecurityUtils.getCurrentUser();
-        return expenseRepository.findByUserId(user.getId()).stream().map(this::mapToResponse).collect(Collectors.toList());
+    // public List<ExpenseResponse> getAllExpenses() {
+    //     User user = SecurityUtils.getCurrentUser();
+    //     return expenseRepository.findByUserId(user.getId()).stream().map(this::mapToResponse).collect(Collectors.toList());
+    // }
+
+    //  public List<ExpenseResponse> getExpensesByCategory(Long userId, String category) {
+    //     return expenseRepository.findByUserIdAndCategory(userId, category).stream().map(this::mapToResponse).collect(Collectors.toList());
+    // }
+
+    public Page<ExpenseResponse> getExpenses(
+        Long userId,
+        String category,
+        int page,
+        int size
+) {
+    Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+
+    Page<Expense> expensePage;
+
+    if (category != null && !category.isBlank()) {
+        expensePage = expenseRepository
+                .findByUserIdAndCategoryIgnoreCase(userId, category, pageable);
+    } else {
+        expensePage = expenseRepository
+                .findByUserId(userId, pageable);
     }
 
-    public Double getTotalExpense() {
-        User user = SecurityUtils.getCurrentUser();
-        return expenseRepository.getTotalExpenseByUserId(user.getId());
+    return expensePage.map(this::mapToResponse);
+}
+
+    public Double getTotalExpense(   Long userId) {
+        return expenseRepository.getTotalExpenseByUserId(userId);
     }
 
-    public List<CategoryData> getCategoryAnalytics() {
-        User user = SecurityUtils.getCurrentUser();
-        List<Object[]> data = expenseRepository.getCategoryWiseExpenseByUserId(user.getId());
+    public List<CategoryData> getCategoryAnalytics(Long userId) {
+        List<Object[]> data = expenseRepository.getCategoryWiseExpenseByUserId(userId);
 
         return data.stream()
                 .map(row -> new CategoryData(
@@ -92,15 +118,12 @@ public class ExpenseService {
                 .toList();
     }
 
-    public BigDecimal getCurrentMonthTotal() {
-        User user = SecurityUtils.getCurrentUser();
-        BigDecimal total = expenseRepository.sumTotalExpenseForCurrentMonth(user.getId());
+    public BigDecimal getCurrentMonthTotal(Long userId) {
+        BigDecimal total = expenseRepository.sumTotalExpenseForCurrentMonth(userId);
         return total != null ? total : BigDecimal.ZERO;
     }
 
-    public List<ExpenseResponse> getExpensesByCategory(Long userId, String category) {
-        return expenseRepository.findByUserIdAndCategory(userId, category).stream().map(this::mapToResponse).collect(Collectors.toList());
-    }
+   
 
 
     public InsightResponse getMonthlyInsights(Long userId, int month, int year) {
