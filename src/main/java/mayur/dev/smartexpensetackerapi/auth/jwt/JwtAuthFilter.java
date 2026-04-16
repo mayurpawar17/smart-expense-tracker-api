@@ -30,13 +30,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
+//        System.out.println("Request URI: " + request.getRequestURI());
+
         String header = request.getHeader("Authorization");
 
         if (header == null || !header.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
-
+//        System.out.println("Auth Header: " + request.getHeader("Authorization"));
         String token = header.substring(7);
 
         if (!jwtUtil.validateToken(token)) {
@@ -45,14 +47,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        String userId = jwtUtil.extractSubject(token);
+        String email = jwtUtil.extractSubject(token);
 
-        User user = userRepository.findById(Long.parseLong(userId)).orElse(null);
+        User user = userRepository.findByEmail(email).orElse(null);
 
         if (user != null) {
             UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
-
+// ADD THIS LINE
+            auth.setDetails(new org.springframework.security.web.authentication.WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
 

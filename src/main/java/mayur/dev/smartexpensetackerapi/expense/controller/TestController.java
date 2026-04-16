@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 public class TestController {
     @GetMapping("/test")
     public ApiResponse<Map<String, Object>> test() {

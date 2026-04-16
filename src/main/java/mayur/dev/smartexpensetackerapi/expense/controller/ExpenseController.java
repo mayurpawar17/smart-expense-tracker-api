@@ -2,7 +2,6 @@ package mayur.dev.smartexpensetackerapi.expense.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import mayur.dev.smartexpensetackerapi.ai.dto.InsightResponse;
 import mayur.dev.smartexpensetackerapi.category.entity.CategoryData;
 import mayur.dev.smartexpensetackerapi.core.utils.SecurityUtils;
@@ -24,9 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/v1/expenses")
+@RequestMapping("/api/v1/expenses")
 @RequiredArgsConstructor
-@Slf4j
 public class ExpenseController {
 
     private final ExpenseService expenseService;

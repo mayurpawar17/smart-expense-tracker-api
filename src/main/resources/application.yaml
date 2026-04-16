@@ -8,12 +8,13 @@ spring:
     password: npg_1NWVOjvAkce6
     driver-class-name: org.postgresql.Driver
   jpa:
-#    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    #    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     show-sql: true
+    open-in-view: false
   
- 
+
   main:
     # Turns off the Spring ASCII Art
     banner-mode: "off"
@@ -25,7 +26,7 @@ logging:
     # Root level WARN silences the generic Spring/Hibernate/Tomcat logs
     root: WARN
     # Keep your specific package at INFO so you can see your own logs
-    mayur.dev.smartexpensetackerapi : INFO
+    mayur.dev.smartexpensetackerapi: INFO
     # Silences the specific "Bean successfully defined" spam
     org.springframework.web: WARN
 
